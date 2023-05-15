@@ -1,23 +1,23 @@
-Для "лицензирования" Jira 7.5.0 необходимо внести изменения в два файла (приведены актуальные версии файлов на момент установки):
+To "license" Jira 7.5.0, you need to make changes to two files (the actual versions of the files are given at the time of installation):
    
 ```
      atlassian-extras-3.2.jar
      atlassian-universal-plugin-manager-plugin-2.22.5.jar
 ``` 
 
-Месторасположение файлов соответственно:
+File locations respectively:
    
 ```
      /opt/atlassian/jira/atlassian-jira/WEB-INF/lib/atlassian-extras-3.2.jar
      /opt/atlassian/jira/atlassian-jira/WEB-INF/atlassian-bundled-plugins/atlassian-universal-plugin-manager-plugin-2.22.5.jar
 ```
 
-Скачиваем файлы на локальный компьютер, устанавливаем инструмент JD-GUI (http://jd.benow.ca/). Далее:
+Download the files to the local computer, install the JD-GUI tool (http://jd.benow.ca/). Further:
 
-   - открываем atlassian-extras-3.2.jar с помощью декомпилятора JD-GUI
-   - жмем File -> Save All Sources или Ctrl+Alt+S (сохранится архив atlassian-extras-3.2.jar.src.zip)
-   - распаковываем полученный архив с помощью архиватора
-   - в atlassian-extras-3.2.jar.src/com/atlassian/extras/decoder/v2/Version2LicenseDecoder.java находим метод loadLicenseConfiguration (в моем случае выглядел так):
+   - open atlassian-extras-3.2.jar with JD-GUI decompiler
+   - click File -> Save All Sources or Ctrl+Alt+S (the atlassian-extras-3.2.jar.src.zip archive will be saved)
+   - unpack the resulting archive using the archiver
+   - in atlassian-extras-3.2.jar.src/com/atlassian/extras/decoder/v2/Version2LicenseDecoder.java we find the loadLicenseConfiguration method (in my case it looked like this):
 ```
      /*     */   private Properties loadLicenseConfiguration(Reader text)
      /*     */   {
@@ -34,7 +34,7 @@
      /*     */   }
 ```
 
-   - и добавляем в данный метод информацию о лицензии:
+   - and add license information to this method:
 ```
      /*     */   private Properties loadLicenseConfiguration(Reader text)
      /*     */   {
@@ -59,13 +59,13 @@
      /*     */     }
      /*     */   }
 ```
-   - сохраняем файл
-   - копируем commons-codec-1.9.jar в директорию с исходниками (atlassian-extras-3.2.jar.src)
-   - переходим в каталог с исходниками (atlassian-extras-3.2.jar.src) и компилируем класс из java-файла, который мы правили:
+   - save the file
+   - copy commons-codec-1.9.jar to source directory (atlassian-extras-3.2.jar.src)
+   - go to the source directory (atlassian-extras-3.2.jar.src) and compile the class from the java file that we edited:
 ```
      javac -cp commons-codec-1.9.jar -sourcepath ./ com/atlassian/extras/decoder/v2/Version2LicenseDecoder.java 
 ```
-   - могут быть ошибки (вызваны “кривостью” декомпиляции исходников), например:
+   - there may be errors (caused by the “crooked” decompilation of source codes), for example:
 ```
      ./com/atlassian/extras/common/LicenseException.java:7: error: class, interface, or enum expected
      /*    */  * @deprecated
@@ -82,17 +82,18 @@
      Note: ./com/atlassian/extras/common/org/springframework/util/StringUtils.java uses unchecked or unsafe operations.
      Note: Recompile with -Xlint:unchecked for details.
 ```
-   - устраняем ошибки и еще раз компилируем класс. После успешного выполнения в каталоге com/atlassian/extras/decoder/v2/ появится файл Version2LicenseDecoder.class
-   - полученныей файл копируем с заменой (по такому же пути com/atlassian/extras/decoder/v2/) в архив atlassian-extras-3.2.jar (проще всего это сделать через mc - Midnight Commander)
-   - в общем случае “новый” архив atlassian-extras-3.2.jar необходимо положить (с заменой) на сервере с Jira в каталог /opt/atlassian/jira/atlassian-jira/WEB-INF/lib/ и перезапустить жиру, в нашем случае нужно пересобрать docker-образ согласно инструкциям в Dockerfile
+   - fix the errors and compile the class again. After successful execution, Version2LicenseDecoder.class file will appear in the com/atlassian/extras/decoder/v2/ directory
+   - copy the resulting file with replacement (along the same path com/atlassian/extras/decoder/v2/) to the atlassian-extras-3.2.jar archive (the easiest way to do this is through mc - Midnight Commander)
+   - in general, the “new” atlassian-extras-3.2.jar archive must be placed (with replacement) on the server with Jira in the /opt/atlassian/jira/atlassian-jira/WEB-INF/lib/ directory and restart the jira, in our in case you need to rebuild the docker image according to the instructions in the Dockerfile
    
    
-Аналогичным образом патчим файл atlassian-universal-plugin-manager-plugin-2.22.5.jar:
+Similarly, we patch the atlassian-universal-plugin-manager-plugin-2.22.5.jar file:
 
-   - открываем atlassian-universal-plugin-manager-plugin-2.22.5.jar с помощью декомпилятора JD-GUI
-   - жмем File -> Save All Sources или Ctrl+Alt+S (сохранится архив atlassian-universal-plugin-manager-plugin-2.22.5.jar.src.zip)
-   - распаковываем полученный архив с помощью архиватора
-   - в atlassian-universal-plugin-manager-plugin-2.22.5.jar.src/com/atlassian/extras/decoder/v2/Version2LicenseDecoder.java находим метод loadLicenseConfiguration (в моем случае выглядел так):
+   - open atlassian-universal-plugin-manager-plugin-2.22.5.jar with JD-GUI decompiler
+   - click File -> Save All Sources or Ctrl+Alt+S (the atlassian-universal-plugin-manager-plugin-2.22.5.jar.src.zip archive will be saved)
+   - unpack the resulting archive using the archiver
+   - in atlassian-universal-plugin-manager-plugin-2.22.5.jar.src/com
+	/atlassian/extras/decoder/v2/Version2LicenseDecoder.java we find the loadLicenseConfiguration method (in my case it looked like this):
 ```
        private Properties loadLicenseConfiguration(Reader text)
        {
@@ -109,7 +110,7 @@
        }
 ```       
        
-   - и добавляем в данный метод информацию о лицензии:
+   - and add license information to this method:
 ```
        private Properties loadLicenseConfiguration(Reader text)
        {
@@ -129,13 +130,13 @@
          }
        }
 ```
-   - сохраняем файл
-   - копируем commons-codec-1.9.jar в директорию с исходниками (atlassian-universal-plugin-manager-plugin-2.22.5.jar.src)
+   - save the file
+   - copy commons-codec-1.9.jar to source directory (atlassian-universal-plugin-manager-plugin-2.22.5.jar.src)
 
-   - переходим в каталог с исходниками (atlassian-universal-plugin-manager-plugin-2.22.5.jar.src) и компилируем класс из java-файла, который мы правили:
+   - go to the source directory (atlassian-universal-plugin-manager-plugin-2.22.5.jar.src) and compile the class from the java file that we edited:
 ```
      javac -cp commons-codec-1.9.jar -sourcepath ./ com/atlassian/extras/decoder/v2/Version2LicenseDecoder.java
 ```     
-   - могут быть ошибки (вызваны “кривостью” декомпиляции исходников), устраняем их и еще раз компилируем класс. После успешного выполнения в каталоге com/atlassian/extras/decoder/v2/ появится файл Version2LicenseDecoder.class
-   - полученныей файл копируем с заменой (по такому же пути com/atlassian/extras/decoder/v2/) в архив atlassian-universal-plugin-manager-plugin-2.22.5.jar (проще всего это сделать через mc - Midnight Commander)
-   - в общем случае “новый” архив atlassian-universal-plugin-manager-plugin-2.22.5.jar необходимо положить (с заменой) на сервере с Jira в каталог /opt/atlassian/jira/atlassian-jira/WEB-INF/atlassian-bundled-plugins/, удалить каталоги ${JIRA_HOME}/plugins/.bundled-plugins и ${JIRA_HOME}/plugins/.bundled-plugins/.osgi-plugins и перезапустить жиру, в нашем случае нужно пересобрать docker-образ согласно инструкциям в Dockerfile
+   - there may be errors (caused by the “crooked” decompilation of the sources), we eliminate them and compile the class again. After successful execution, the Version2LicenseDecoder.class file will appear in the com/atlassian/extras/decoder/v2/ directory
+   - copy the resulting file with replacement (along the same path com/atlassian/extras/decoder/v2/) to the atlassian-universal-plugin-manager-plugin-2.22.5.jar archive (the easiest way to do this is through mc - Midnight Commander)
+   - in general, the “new” atlassian-universal-plugin-manager-plugin-2.22.5.jar archive must be placed (with replacement) on the Jira server in the /opt/atlassian/jira/atlassian-jira/WEB-INF/ directory atlassian-bundled-plugins/, delete ${JIRA_HOME}/plugins/.bundled-plugins and ${JIRA_HOME}/plugins/.bundled-plugins/.osgi-plugins directories and restart jira, in our case we need to rebuild the docker image according to instructions in Dockerfile
